@@ -9,6 +9,7 @@
     "node-gyp-build": "^3.0.0"
   },
   "devDependencies": {
+    "find-msbuild": "^1.0.0",
     "node-gyp": "^3.6.1",
     "prebuildify": "^2.3.3",
     "sodium-test": "^0.7.0",

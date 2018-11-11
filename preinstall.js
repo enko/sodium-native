@@ -5,6 +5,7 @@ var os = require('os')
 var proc = require('child_process')
 var path = require('path')
 var ini = require('ini')
+var msbuild = require('find-msbuild')
 
 var dir = path.join(__dirname, 'libsodium')
 var tmp = path.join(__dirname, 'tmp')
@@ -65,15 +66,19 @@ function buildWindows () {
 
   spawn('.\\msvc-scripts\\process.bat', [], {cwd: dir, stdio: 'inherit'}, function (err) {
     if (err) throw err
-    var msbuild = path.resolve('/', 'Program Files (x86)', 'MSBuild/14.0/Bin/MSBuild.exe')
-    var args = ['/p:Configuration=ReleaseDLL;Platform=' + warch, '/nologo']
-    spawn(msbuild, args, {cwd: dir, stdio: 'inherit'}, function (err) {
+
+    msbuild(function (err, cmd) {
       if (err) throw err
 
-      var dll = path.join(dir, 'Build/ReleaseDLL/' + warch + '/libsodium.dll')
-
-      fs.rename(dll, res, function (err) {
+      var args = ['/p:Configuration=ReleaseDLL;Platform=' + warch, '/nologo']
+      spawn(cmd, args, { cwd: dir, stdio: 'inherit' }, function (err) {
         if (err) throw err
+
+        var dll = path.join(dir, 'Build/ReleaseDLL/' + warch + '/libsodium.dll')
+
+        fs.rename(dll, res, function (err) {
+          if (err) throw err
+        })
       })
     })
   })
